@@ -1,0 +1,49 @@
+0.8
+
+* Fixed a bug involving WordPress installations that are at the root
+of the site's directory structure.
+
+0.7
+
+* Upgraded plugin to work with Wordpress 2.1!
+* Added support for Quicktag button in the TinyMCE editor!
+* Better handling of directories on non-Unix systems.
+
+0.6
+
+* Some servers are configured to disallow fopen() calls to use a URL,
+which in turn prevents getimagesize() from working with URLs. As a
+fallback, the plugin will now look for files both by URL and by
+filename on the local server. To support this, the plugin has a new
+option: the directory on your local server that corresponds to your
+website.
+
+0.5
+
+* Fixed a bug involving array_combine() and array_merge() that
+occurred under some versions of PHP.
+* Fixed a bug that kept the UI from correctly finding a generated
+thumbnail image.
+
+0.4
+
+* The "Insert" button doesn't work with the rich visual editor. As a
+stopgap measure, the "Preview" button now shows the code to be pasted
+in the post, so that you can copy and paste it yourself.
+
+0.3
+
+* Fixed a bug that caused the wrong URL to be reported if the
+image or thumbnail couldn't be found.
+* Fixed a bug that cause the wrong URL to be reported if the
+auto-generated thumbnail couldn't be saved.
+* The "Add a popup image" link is now available when writing a new
+page using the visual rich editor.
+* When using the "Add a popup image" link with the visual rich editor,
+the main window is no longer taken over by a second copy of the page
+that allows you to choose the correct image and thumbnail.
+
+0.2
+
+* Now chmods thumbnails to be readable and writeable by anyone.
+* Link tag now has the attribute tag set.
