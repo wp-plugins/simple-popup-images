@@ -3,8 +3,8 @@ Contributors: sgranade
 Donate link: http://granades.com/simple-popup-images/
 Tags: images, post, admin, popup, media
 Requires at least: 2.0.4
-Tested up to: 2.1
-Stable tag: 0.7
+Tested up to: 2.3.3
+Stable tag: 1.0
 
 The Simple Popup Images plugin allows you to add pop-up images to your
 Wordpress blog.
@@ -14,9 +14,7 @@ Wordpress blog.
 The Simple Popup Images plugin allows you to add pop-up images to your
 Wordpress blog. You put a thumbnail image in your post; if
 a user clicks on it, a larger version appears in a separate
-window. Want to see it in action? [Check out this
-post](http://granades.com/2006/07/13/how-to-disassemble-a-toilet-in-many-easy-steps/
-"A post with the popup images plugin in action.").
+window.
 
 Features that I think are cool:
 
@@ -32,11 +30,10 @@ the visual rich editor under WordPress 2.1, select the "Code" tab on
 the editor to see the quicktags. Click the button and a window will
 pop up. Follow the new page's directions.
 
-**Important note for visual rich editor users under WP 2.0**: There is a
-known bug with the "Insert" button. What you will need to do for now
-is press the "Preview" button and copy-and-paste the code from the
-"Popup Image Code" box into your post. You can then close the popup
-window.
+**Important note for visual rich editor users under WP 2.0**: There is
+a known bug with the "Insert" button. What you will need to do is
+press the "Preview" button and copy-and-paste the code from the "Popup
+Image Code" box into your post. You can then close the popup window.
 
 == Installation ==
 
