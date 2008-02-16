@@ -1,7 +1,18 @@
+1.0
+
+* This plugin is now abandoned, and will not be further developed.
+* Fixed a bug where the "Popim" button wouldn't show up when writing a
+new page.
+
+0.9
+
+* New feature: popup windows can now have scrollbars.
+
 0.8
 
 * Fixed a bug involving WordPress installations that are at the root
 of the site's directory structure.
+* Better handling of directories overall.
 
 0.7
 

@@ -45,7 +45,8 @@ if (isset($_POST['insert'])) {
 				      $_POST['image_title'],
 				      $_POST['thumbnail_url'],
 				      0,0,0,0,
-				      $_POST['persistent'] == 'yes');
+				      $_POST['persistent'] == 'yes',
+				      $_POST['scrollbars'] == 'yes');
   }
 }
 
@@ -148,6 +149,17 @@ function popimui_make_options_form() {
   $html .=
     "<div>\n".
     "    <fieldset>\n".
+    "        <legend>Should the popup image have scrollbars?</legend>\n".
+    "        <input type='radio' name='scrollbars' value='yes'".
+    (($_HTML['scrollbars'] == 'no') ? '' : " checked='checked'").
+    ">Yes</input>\n".
+    "        <input type='radio' name='scrollbars' value='no'".
+    (($_HTML['scrollbars'] == 'yes') ? '' : " checked='checked'").
+    ">No</input>\n".
+    "    </fieldset>\n".
+    "</div>\n\n".
+    "<div>\n".
+    "    <fieldset>\n".
     "        <legend>What should happen when the user clicks away from the image?</legend>\n".
     "        <input type='radio' name='persistent' value='yes'".
     (($_HTML['persistent'] == 'no') ? '' : " checked='checked'").
@@ -174,7 +186,8 @@ function popimui_make_preview() {
 			      $_POST['image_title'],
 			      $_POST['thumbnail_url'],
 			      0, 0, 0, 0,
-			      $_POST['persistent'] == 'yes').
+			      $_POST['persistent'] == 'yes',
+			      $_POST['scrollbars'] == 'yes').
     "    </fieldset>\n".
     "</div>\n\n".
     "<div>\n".
@@ -185,7 +198,8 @@ function popimui_make_preview() {
 				    $_POST['image_title'],
 				    $_POST['thumbnail_url'],
 				    0, 0, 0, 0,
-				    $_POST['persistent'] == 'yes').
+				    $_POST['persistent'] == 'yes',
+				    $_POST['scrollbars'] == 'yes').
     "</textarea>\n".
     "    </fieldset>\n".
     "</div>\n\n";
@@ -256,13 +270,13 @@ function popimui_generate_thumbnail($image_url, $thumb_width, $thumb_height) {
     $path_dirs = preg_split('|//?|', $popim_wp_path, -1,
 			    PREG_SPLIT_NO_EMPTY);
     $basedir = implode('/',
-					   array_slice($path_dirs, 0,
-								   count($path_dirs)-$number_of_dirs)).'/';
+		       array_slice($path_dirs, 0,
+				   count($path_dirs)-$number_of_dirs)).'/';
 	// If ABSDIR is on a Windows machine and thus has a "C:"
 	// drive-letter-and-colon at the start, don't prepend a "/"
 	// to $basedir
 	if (!preg_match("|^[a-z]:/|i", $basedir)) {
-			$basedir = '/'.$basedir;
+	  $basedir = '/'.$basedir;
 	}
   }
   else $basedir = $popim_wp_path;

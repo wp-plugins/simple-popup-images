@@ -3,7 +3,7 @@
 Plugin Name: Simple Popup Images
 Plugin URI: http://granades.com/simple-popup-images/
 Description: Allows you to insert image thumbnails that, when clicked on, pop up a new window with a larger image. The popup windows can be made to vanish when the user clicks away from them. <b>Configuration</b>: <a href="options-general.php?page=popup-images/popup-images.php">Options &raquo; Simple Popup Images</a>.
-Version: 0.7
+Version: 1.0
 Author: Stephen Granade
 Author URI: http://granades.com/
 */
@@ -40,7 +40,7 @@ function popim_filter($text) {
 function popim_parse_link_from_attribs($str) {
   // Possible attributes, listed as a regexp join
   $attrib_pattern = '(imageurl|title|thumbnailurl|imagewidth|'.
-    'imageheight|thumbwidth|thumbheight|ispersistent)';
+    'imageheight|thumbwidth|thumbheight|ispersistent|scrollbars)';
 
   // Pull out all attributes and shove them into arrays. Attribute
   // strings are surrounded by quotemarks. We make sure not to
@@ -95,7 +95,8 @@ function popim_parse_link_from_attribs($str) {
 				   $attrib_array['imageheight'],
 				   $attrib_array['thumbwidth'],
 				   $attrib_array['thumbheight'],
-				   $attrib_array['ispersistent']);
+				   $attrib_array['ispersistent'],
+				   $attrib_array['scrollbars']);
 }
 
 // Convert options for a popup image into a fake HTML tag. All options
@@ -103,7 +104,8 @@ function popim_parse_link_from_attribs($str) {
 function popim_generate_str_from_options($url_to_image, $image_title,
 					 $url_to_thumbnail, $image_width,
 					 $image_height, $thumbnail_width,
-					 $thumbnail_height, $is_persistent) {
+					 $thumbnail_height, $is_persistent,
+					 $has_scrollbars) {
   // If the image's size wasn't specified, compute it
   if ($image_width <= 0 || $image_height <= 0) {
     if ($image_size =
@@ -128,6 +130,10 @@ function popim_generate_str_from_options($url_to_image, $image_title,
   if ($is_persistent) {
     $persistence_str=' isPersistent="1"';
   }
+  // Set scrollbars
+  if ($has_scrollbars) {
+    $scrollbar_str .= ' scrollbars="1"';
+  }
   // Because of how backslashing is done, we need to escape any
   // single quote marks in the title
   return "<popim imageURL='$url_to_image' title='".
@@ -136,7 +142,7 @@ function popim_generate_str_from_options($url_to_image, $image_title,
     "imageWidth='$image_width' imageHeight='$image_height' ".
     "thumbWidth='$thumbnail_width' ".
     "thumbHeight='$thumbnail_height'".$persistence_str.
-    " />";
+    $scrollbar_str." />";
 }
 
 // Generate the actual HTML for the popup, given certain information
@@ -148,7 +154,8 @@ function popim_generate_str_from_options($url_to_image, $image_title,
 function popim_generate_popup_link($url_to_image, $image_title,
 				   $url_to_thumbnail, $image_width,
 				   $image_height, $thumbnail_width,
-				   $thumbnail_height, $is_persistent) {
+				   $thumbnail_height, $is_persistent,
+				   $has_scrollbars) {
   $image_title_urlencoded = rawurlencode($image_title);
   $image_title_mouseover = addslashes($image_title);
   $image_title_attrib = htmlspecialchars($image_title);
@@ -190,6 +197,14 @@ function popim_generate_popup_link($url_to_image, $image_title,
   else {
     $persistence_str='';
   }
+  // Set scrollbars
+  $scrollbar_str = 'scrollbars=';
+  if ($has_scrollbars) {
+    $scrollbar_str .= 'yes';
+  }
+  else {
+    $scrollbar_str .= 'no';
+  }
   
   return '<a title="' . $image_title_attrib .
     '" href="#" onclick="window.open(\''.$template_path.
@@ -198,7 +213,8 @@ function popim_generate_popup_link($url_to_image, $image_title,
     '&title=' . $image_title_urlencoded . 
     $persistence_str . '\',\'imagepopup\',\'width=' .
     $image_width . ',height=' . $image_height .
-    ',directories=no,location=no,menubar=no,scrollbars=no,status=no,toolbar=no,resizable=no,screenx=150,screeny=150\');return false" onmouseover="window.status=\'image popup: ' . $image_title_mouseover . 
+    ',directories=no,location=no,menubar=no,'.$scrollbar_str.
+    ',status=no,toolbar=no,resizable=no,screenx=150,screeny=150\');return false" onmouseover="window.status=\'image popup: ' . $image_title_mouseover . 
     '\';return true" onmouseout="window.status=\'\';return true"><img src="' . $url_to_thumbnail .
     '" width="' . $thumbnail_width . 
     '" height="' . $thumbnail_height .
@@ -284,21 +300,24 @@ function popim_get_script_dir_url() {
 
 // Turn a URL into a directory.
 function popim_turn_url_to_dir($url) {
-  // If there is a server name at the start of the URL, get rid
-  // of it.
-  if (substr($url, 0, 7) == 'http://') {
-    $url = substr($url, 7);
-  }
-  else if (substr($url, 0, 8) == 'https://') {
-    $url = substr($url, 8);
-  }
-  
-  // If there's a leading slash in the URL, remove it
-  $url = ltrim($url, "/");
-  
-  // Return the URL with the directory given in the
-  // popim_home_directory option prepended
-  return get_option('popim_home_directory').$url;
+  // To try to find a file that's specified by URL (for the cases
+  // where PHP won't let us get to the file via URL), we try a
+  // couple of different approaches. One, we use both the hostname
+  // and path from the URL. Two, we use only the path. If the file
+  // doesn't exist in the first case, we default to the second case.
+
+  $homedir = get_option('popim_home_directory');
+
+  $url_bits = parse_url($url);
+
+  // Try the hostname + path approach
+  $dir_from_url = $homedir.ltrim($url_bits['host'].$url_bits['path'], "/");
+  if (file_exists($dir_from_url))
+    return $dir_from_url;
+
+  $dir_from_url = $homedir.ltrim($url_bits['path'], "/");
+
+  return $dir_from_url;
 }
 
 
@@ -312,7 +331,7 @@ add_filter('mce_valid_elements', 'popim_mce_valid_elements', 0);
 
 function popim_mce_valid_elements($valid_elements) {
   $valid_elements .= '+popim[imageurl|title|thumbnailurl|imagewidth|'.
-    'imageheight|thumbwidth|thumbheight|ispersistent]';
+    'imageheight|thumbwidth|thumbheight|ispersistent|scrollbars]';
   return $valid_elements;
 }
 
@@ -325,6 +344,7 @@ function popim_quicktag_like_button() {
   if (strpos($_SERVER['REQUEST_URI'], 'post.php') ||
       strpos($_SERVER['REQUEST_URI'], 'post-new.php') || 
       strpos($_SERVER['REQUEST_URI'], 'page-new.php') ||
+      strpos($_SERVER['REQUEST_URI'], 'page.php') ||
       strpos($_SERVER['REQUEST_URI'], 'bookmarklet.php')) {
     $popim_wp_url = get_option('siteurl');
     $popim_UI_script_filename = 'popup-images-ui.php';
